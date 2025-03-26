@@ -1,16 +1,23 @@
 from pydantic import BaseModel, EmailStr
+from typing import Optional
+from datetime import datetime
 
 
-class UserBase(BaseModel):
-    username: str
+class UserRegister(BaseModel):
     email: EmailStr
     full_name: str
-    role: str
+    role: Optional[str] = "admin"  # Giá trị mặc định là "admin"
+    password: str  # Nên hash mật khẩu trước khi lưu
 
 
-class UserCreate(UserBase):
+class LoginRequest(BaseModel):
+    email: EmailStr  # Đảm bảo email hợp lệ
     password: str
+    device_info: Optional[str] = None
 
 
-class UserResponse(UserBase):
-    id: str
+class UserResponse(BaseModel):
+    email: EmailStr
+    full_name: str
+    role: Optional[str] = "admin"  # Giá trị mặc định là "admin"
+    created_at: datetime

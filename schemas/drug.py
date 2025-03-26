@@ -6,25 +6,30 @@ class HoatChat(BaseModel):
     nongDo: str
 
 class Drug(BaseModel):
-    id: str
+    id:Optional[str]
     tenThuoc: str
-    dotPheDuyet: str
-    soQuyetDinh: str
-    pheDuyet: str
+    dotPheDuyet:Optional[str]
+    soQuyetDinh:Optional[str]
+    pheDuyet:Optional[str]
     hieuLuc: Optional[str]
-    soDangKy: str
+    soDangKy:Optional[str]
     hoatChat: List[HoatChat]
     phanLoai: Optional[str]
     taDuoc: Optional[str]
-    baoChe: str
-    dongGoi: str
-    tieuChuan: str
-    tuoiTho: str
-    congTySx: str
-    congTySxCode: str
-    nuocSx: str
-    diaChiSx: str
-    congTyDk: str
-    nuocDk: str
-    diaChiDk: str
-    nhomThuoc: str
+    baoChe:Optional[str]
+    dongGoi:Optional[str]
+    tieuChuan:Optional[str]
+    tuoiTho:Optional[str]
+    congTySx:Optional[str]
+    congTySxCode:Optional[str]
+    nuocSx:Optional[str]
+    diaChiSx:Optional[str]
+    congTyDk:Optional[str]
+    nuocDk:Optional[str]
+    diaChiDk:Optional[str]
+    nhomThuoc:Optional[str]
+    
+# Định nghĩa Pydantic model để ánh xạ dữ liệu từ request
+
+
+

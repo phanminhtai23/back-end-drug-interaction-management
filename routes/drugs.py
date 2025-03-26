@@ -1,51 +1,63 @@
 # routes/drugs.py
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
+from utils.security import get_current_user
 from database import drugs_collection
 from schemas.drug import Drug
 
 router = APIRouter()
 
-
+# Lất tất cả các thuốc /drugs
 @router.get("/", response_model=list[Drug])
-async def get_all_drugs():
-    print("Getting all drugs")
+async def get_all_drugs(user: dict = Depends(get_current_user)):
+    if not user:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
     drugs = await drugs_collection.find().to_list(100)
-    # Xử lý dữ liệu không hợp lệ
-    # Xử lý dữ liệu không hợp lệ
+    
+    # Filter and validate drugs
     valid_drugs = []
     for drug in drugs:
         try:
-            # Thử chuyển đổi dữ liệu thành mô hình Drug
             valid_drugs.append(Drug(**drug))
         except Exception as e:
-            # In lỗi và dữ liệu không hợp lệ
-            print(f"Error: {e}")
-            print(f"Invalid data: {drug}")
+            print(f"Validation error: {e}, skipping invalid drug: {drug}")
 
-    # Trả về danh sách các thuốc hợp lệ
-    return valid_drugs
+    print("Lấy tất cả các thuốc !")
+    return {"message": "Inserted successfully", drugs: valid_drugs}
 
 
-
+# Thêm một thuốc mới
 @router.post("/", response_model=Drug)
-async def add_drug(drug: Drug):
+async def add_drug(drug: Drug, user: dict = Depends(get_current_user)):
+    if not user:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
     existing_drug = await drugs_collection.find_one({"id": drug.id})
     if existing_drug:
         raise HTTPException(status_code=400, detail="Thuốc đã tồn tại !!")
     await drugs_collection.insert_one(drug.model_dump())
-    return drug
+    return {"message": "Inserted successfully"}
 
 
+# tới đây
+# Cập nhật thông tin một thuốc
 @router.put("/{drug_id}")
-async def update_drug(drug_id: str, drug: Drug):
-    result = await drugs_collection.update_one({"id": drug_id}, {"$set": drug.dict()})
+async def update_drug(drug_id: str, drug: Drug, user: dict = Depends(get_current_user)):
+    if not user:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
+    result = await drugs_collection.update_one({"id": drug_id}, {"$set": drug.model_dump()})
     if result.modified_count == 0:
         raise HTTPException(status_code=404, detail="Drug not found")
     return {"message": "Drug updated successfully"}
 
 
+# Xóa một thuốc
 @router.delete("/{drug_id}")
-async def delete_drug(drug_id: str):
+async def delete_drug(drug_id: str, user: dict = Depends(get_current_user)):
+    if not user:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+    
     result = await drugs_collection.delete_one({"id": drug_id})
     if result.deleted_count == 0:
         raise HTTPException(status_code=404, detail="Drug not found")

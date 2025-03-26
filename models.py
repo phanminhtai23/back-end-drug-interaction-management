@@ -1,19 +1,8 @@
 from pydantic import BaseModel, EmailStr
 from typing import List, Optional
 
-# User model
-
-
-class User(BaseModel):
-    username: str
-    email: EmailStr
-    full_name: str
-    password: str
-    role: str
 
 # Drug model
-
-
 class HoatChat(BaseModel):
     tenHoatChat: str
     nongDo: str
