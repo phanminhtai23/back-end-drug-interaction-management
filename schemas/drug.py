@@ -1,6 +1,7 @@
 from pydantic import BaseModel
 from typing import List, Optional
 
+
 class HoatChat(BaseModel):
     tenHoatChat: str
     nongDo: str
