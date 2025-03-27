@@ -1,14 +1,13 @@
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
 from database import users_collection, tokens_collection
 from schemas.user import UserRegister, LoginRequest, UserResponse
-from utils.security import hash_password, verify_password
+from utils.security import hash_password, verify_password, get_current_user
 from utils.jwt import create_access_token
-from typing import Optional
+from fastapi.encoders import jsonable_encoder
 # Assuming tokens_collection is defined in database
 
 
 router = APIRouter()
-
 
 @router.post("/register")
 async def register(user: UserRegister):
@@ -39,13 +38,12 @@ async def register(user: UserRegister):
 async def login(user: LoginRequest):
     db_user = await users_collection.find_one({"email": user.email})
     # Check if the user exists and the password is correct
-    if not db_user:
+    if not db_user: 
         raise HTTPException(status_code=404, detail="Email chưa đăng ký tài khoản")
     if not verify_password(user.password, db_user["password"]):
         raise HTTPException(status_code=401, detail="Sai mật khẩu")
     
     # Đăng nhập thành công, tạo access token
-    
     access_token, created_at, expires_at = create_access_token(
         data={"sub": db_user["email"]})
     # Save the token to the tokens collection
@@ -64,19 +62,20 @@ async def login(user: LoginRequest):
         "token_type": "bearer",
         "message": "Đăng nhập thành công",
         "full_name": db_user["full_name"],
-        "_id": db_user["_id"]
     }
 
 
-@router.get("/", response_model=list[UserResponse])
-async def get_all_users():
+@router.get("/")
+async def get_all_users(user: dict = Depends(get_current_user)):
+    if not user:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
     users = await users_collection.find().to_list(100)
-    return [
-        UserResponse(
-            email=user["email"],
-            full_name=user["full_name"],
-            role=user.get("role", "admin"),
-            created_at=user["created_at"]
-        )
-        for user in users
-    ]
+    valid_users = []
+    for user in users:
+        try:
+            valid_users.append(UserRegister(**user))
+        except Exception as e:
+            print(f"Validation error: {e}, skipping invalid drug: {user}")
+
+    return {"message": "Got users successfully", "users": valid_users}

@@ -7,7 +7,6 @@ import uvicorn
 from config import HOST, PORT
 
 
-
 app = FastAPI()
 
 app.include_router(users_router, prefix="/users", tags=["Users"])

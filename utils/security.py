@@ -17,7 +17,7 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 
 oauth2_scheme = OAuth2PasswordBearer(
-    tokenUrl="/users/login")
+    tokenUrl="/users/token")
 
 
 def get_current_user(token: str = Depends(oauth2_scheme)):

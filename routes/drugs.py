@@ -7,7 +7,7 @@ from schemas.drug import Drug
 router = APIRouter()
 
 # Lất tất cả các thuốc /drugs
-@router.get("/", response_model=list[Drug])
+@router.get("/")
 async def get_all_drugs(user: dict = Depends(get_current_user)):
     if not user:
         raise HTTPException(status_code=401, detail="Unauthorized")
@@ -22,12 +22,11 @@ async def get_all_drugs(user: dict = Depends(get_current_user)):
         except Exception as e:
             print(f"Validation error: {e}, skipping invalid drug: {drug}")
 
-    print("Lấy tất cả các thuốc !")
-    return {"message": "Inserted successfully", drugs: valid_drugs}
+    return {"message": "Got drugs successfully", "drugs": valid_drugs}
 
 
 # Thêm một thuốc mới
-@router.post("/", response_model=Drug)
+@router.post("/")
 async def add_drug(drug: Drug, user: dict = Depends(get_current_user)):
     if not user:
         raise HTTPException(status_code=401, detail="Unauthorized")
@@ -36,7 +35,7 @@ async def add_drug(drug: Drug, user: dict = Depends(get_current_user)):
     if existing_drug:
         raise HTTPException(status_code=400, detail="Thuốc đã tồn tại !!")
     await drugs_collection.insert_one(drug.model_dump())
-    return {"message": "Inserted successfully"}
+    return {"message": "Inserted successfully", "drugs": drug}
 
 
 # tới đây
@@ -49,7 +48,7 @@ async def update_drug(drug_id: str, drug: Drug, user: dict = Depends(get_current
     result = await drugs_collection.update_one({"id": drug_id}, {"$set": drug.model_dump()})
     if result.modified_count == 0:
         raise HTTPException(status_code=404, detail="Drug not found")
-    return {"message": "Drug updated successfully"}
+    return {"message": "Drug updated successfully", "drug": drug}
 
 
 # Xóa một thuốc
