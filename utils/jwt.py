@@ -15,13 +15,21 @@ def create_access_token(data: dict):
     return encoded_jwt, created_at, expires_at
 
 # Xác minh JWT
-def verify_access_token(token: str):
+async def verify_access_token(token: str):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
 
         # Kiểm tra hạn token
         if payload["exp"] < datetime.now(timezone.utc).timestamp():
             return None  # Token hết hạn
+
+        # print("voday neee")
+
+        token_data = await tokens_collection.find_one({"token": token})
+        is_revoked = token_data and token_data.get("is_revoked", False)
+        
+        if is_revoked:
+            return None  # Token đã bị thu hồi
 
         return payload  # Token hợp lệ, trả về payload chứa thông tin user
     except JWTError:

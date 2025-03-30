@@ -21,3 +21,8 @@ class UserResponse(BaseModel):
     full_name: str
     role: Optional[str] = "admin"  # Giá trị mặc định là "admin"
     created_at: datetime
+
+
+class UserUpdate(BaseModel):
+    full_name: Optional[str] = None
+    role: Optional[str] = None  # Có thể là "admin" hoặc "user"
