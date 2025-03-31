@@ -2,14 +2,18 @@
 
 # dependencies
 /node_modules
+/ai_models
 /.pnp
 .pnp.js
+
 
 # testing
 /coverage
 
 # production
 /build
+*.h5
+
 
 # misc
 .DS_Store
