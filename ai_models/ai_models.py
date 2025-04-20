@@ -5,10 +5,12 @@ from ai_models.CRAFT.rotated_img_craft import Craft_Model
 from ai_models.CNN.Rotate_image import CNN_Model
 from ai_models.GEMINI.gemini_model import Gemini_Model
 
+result_folder = "./ai_models/Result_Images/"
+
 class AI_Models:
     def __init__(self):
         self.Yolov11_Model = Yolov11_Model(
-            model_path="./ai_models/SEG_YOLOv11/weights/last.pt",)
+            model_path="./ai_models/SEG_YOLOv11/weights/best.pt",)
         
         self.Craft_Model = Craft_Model(
             model_path="./ai_models/CRAFT/craft_mlt_25k.pth")
@@ -39,15 +41,15 @@ class AI_Models:
     def image_processing_stream(self, pil_img):
         # YOLO nhận diện tài liệu
         detected_document_img = self.Yolov11_Model.detect_document_yolo11(
-            pil_img=pil_img, show_time=False, save_result=False, result_folder=None)
+            pil_img=pil_img, show_time=True, save_result=True, result_folder=result_folder)
 
         # Craft để xoay ảnh
         rotated_image = self.Craft_Model.rotate_image_equal_craft(
-            pil_img=detected_document_img, show_time=False, save_result=False, result_folder=None, is_save_mask=False, is_save_boxes=False, filename="result_img")
+            pil_img=detected_document_img, show_time=True, save_result=True, result_folder=result_folder, is_save_mask=True, is_save_boxes=True, filename="result_img")
 
         # CNN để lật ảnh nếu ngược
         orientatied_img = self.CNN_Model.image_flip_prediction(
-            pil_img=rotated_image, show_time=False, save_result=False, result_folder=None)
+            pil_img=rotated_image, show_time=True, save_result=True, result_folder=result_folder)
         
         # print("Đã xử lý ảnh qua flows: Yolo -> Craft -> CNN")
         # self.preview_img(orientatied_img)
@@ -57,15 +59,21 @@ class AI_Models:
     def get_DDIs_from_images(self, imgs_arr):
         return self.Gemini_Model.images_to_DDIs(imgs_arr=imgs_arr)
     
-    def get_DDIs_from_pdf(self, pdf_url):
+    def get_DDIs_from_pdf(self, pdf_url, show_time=True):
+        to = Time.time()
+        if show_time:
+            print(f"Time to get DDI from pdf: {Time.time() - to:.2f}s")
         return self.Gemini_Model.pdf_to_DDIs(pdf_url=pdf_url)
     
     
-    def get_infor_drug_from_images(self, imgs_arr):
+    def get_infor_drug_from_images(self, imgs_arr, show_time=True):
+        to = Time.time()
+        if show_time:
+            print(f"Time to get DDI from img: {Time.time() - to}s")
         return self.Gemini_Model.images_to_drug_infor(imgs_arr=imgs_arr)
     
-    def get_infor_drug_from_pdf(self, imgs_arr):
-        return self.Gemini_Model.pdf_to_drug_infor(imgs_arr=imgs_arr)
+    def get_infor_drug_from_pdf(self, pdf_url):
+        return self.Gemini_Model.pdf_to_drug_infor(pdf_url=pdf_url)
     
     def preview_img(self, pil_image):
         pil_image.show()    

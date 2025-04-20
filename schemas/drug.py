@@ -3,17 +3,17 @@ from typing import List, Optional
 
 
 class HoatChat(BaseModel):
-    tenHoatChat: str
-    nongDo: str
+    tenHoatChat: Optional[str]
+    nongDo: Optional[str]
 
 class Drug(BaseModel):
-    id:Optional[str]
+    id: str
     tenThuoc: str
     dotPheDuyet:Optional[str]
     soQuyetDinh:Optional[str]
     pheDuyet:Optional[str]
-    hieuLuc: Optional[str]
-    soDangKy:Optional[str]
+    hieuLuc: Optional[str] = None
+    soDangKy: str
     hoatChat: List[HoatChat]
     phanLoai: Optional[str]
     taDuoc: Optional[str]

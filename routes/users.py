@@ -72,7 +72,7 @@ async def get_all_users(user: dict = Depends(get_current_user)):
     if not user:
         raise HTTPException(status_code=401, detail="Unauthorized")
 
-    users = await users_collection.find({"role": "user"}).to_list(100)
+    users = await users_collection.find({"role": "user"}).to_list()
     valid_users = []
     for user in users:
         try:

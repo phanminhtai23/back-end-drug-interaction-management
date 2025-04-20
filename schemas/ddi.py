@@ -1,14 +1,15 @@
 from pydantic import BaseModel
+from typing import List, Optional
 
 
 class DDI(BaseModel):
-    id: str
-    TenThuoc: str
+    id: Optional[str]
+    TenThuoc: Optional[str] = None
     HoatChat_1: str
     HoatChat_2: str
-    MucDoNghiemTrong: str
-    CanhBaoTuongTacThuoc: str
+    MucDoNghiemTrong: Optional[str] = "Không xác định"
+    CanhBaoTuongTacThuoc: Optional[str] = "Không xác định"
 
 class deleteRequest(BaseModel):
-        HoatChat_1: str
-        HoatChat_2: str
+    HoatChat_1: str
+    HoatChat_2: str
